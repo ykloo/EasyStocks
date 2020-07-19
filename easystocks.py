@@ -16,7 +16,7 @@ bot.
 import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
+from getNews import initialise_driver
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,7 +33,8 @@ def start(update, context):
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
 
     # context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
-    update.message.reply_text('Hello! Welcome to EasyStocks! Enter a stock ticker to start!')
+    text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start! \n\neg. AAPL, TSLA</b>'
+    update.message.reply_text(text, parse_mode = 'HTML')
 
 
 def help_command(update, context):
@@ -44,14 +45,37 @@ def enter(update, context, text):
     """Send a message when the command /help is issued."""
     update.message.reply_text(f'This is what you have entered: {text}')
     update.message.reply_text('Searching...')
+    data = initialise_driver(text)
 
-    return text
+    name = data[0]
+    price_changes = data[1]
+    articles_objects = data[2]
+
+    price = price_changes[0]
+    changes = price_changes[1]
+
+    output = f'<b>{name}</b>\n{price} \n{changes} \n\n<b>LATEST NEWS \n\n</b>'
+
+    for i in range(len(articles_objects)):
+        article = articles_objects[i]
+        author = article.author
+        date = article.date
+        headline = article.headline
+        link = article.link
+        # output += f'{author} {date} \n{i+1}.{headline} \n{link} \n\n '
+        output += f'{author} | {date} \n{i+1}.  <a href="{link}">{headline}</a> \n\n'
+
+
+
+    update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
+    
+
+    # return text
 
 
 def echo(update, context):
     """Echo the user message."""
     text = update.message.text
-    # update.message.reply_text(update.message.text)
     return enter(update, context, text)
 
 
