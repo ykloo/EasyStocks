@@ -6,28 +6,49 @@ from selenium.common.exceptions import TimeoutException
 from News import News
 
 
+def initialise_driver(text):
+    options = webdriver.ChromeOptions()
+    options.add_argument("headless")
+    driver = webdriver.Chrome('C:\Bot\chromedriver.exe',options=options)
+    # driver = webdriver.Chrome()
+    driver.get(f'https://sg.finance.yahoo.com/quote/{text}')
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="quoteNewsStream-0-Stream"]/ul')))
 
-options = webdriver.ChromeOptions()
-options.add_argument("headless")
-driver = webdriver.Chrome(options=options)
+    #returns name
+    name = find_name(driver)
 
-# driver = webdriver.Chrome()
-driver.get('https://sg.finance.yahoo.com/quote/TSLA')
+    #returns tuple consisting of price and its changes
+    price_changes = find_price_and_changes(driver)
 
-WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="quoteNewsStream-0-Stream"]/ul')))
+    authors = find_news_providers(driver)
 
+    dates = find_news_dates(driver)
 
-#sets timeout if there is no response or page doesnt finish loading??
-#timeout = 30
-# try:
-#     WebDriverWait(driver, timeout).until(EC.visibility_of_element_located((By.CLASS_NAME, "C(#959595)")))
-# except TimeoutException:
-#     driver.quit()
+    headlines_links = find_news_headlines(driver)
+    driver.quit()
 
+    headlines = headlines_links[0]
+    links = headlines_links[1]
+
+    #returns a list of news objects
+    list_news = []
+    for i in range(len(dates)):
+        author = authors[i]
+        date = dates[i]
+        headline = headlines[i]
+        link = links[i]
+        article = News(author, date, headline, link)
+
+        list_news.append(article)
+    return name, price_changes, list_news
+
+def find_name(driver):
+    name = driver.find_elements_by_xpath('//*[@id="quote-header-info"]/div[2]/div[1]/div[1]/h1')
+    return name[0].text
 
 
 #finds price and price changes
-def find_price_and_changes():
+def find_price_and_changes(driver):
     span_tag_price = driver.find_elements_by_xpath('//*[@id="quote-header-info"]/div[3]/div/div/span[1]')
     span_tag_change = driver.find_elements_by_xpath('//*[@id="quote-header-info"]/div[3]/div/div/span[2]')
 
@@ -36,7 +57,7 @@ def find_price_and_changes():
 
 #finds news provider
 
-def find_news_providers():
+def find_news_providers(driver):
     news_providers = []
     for i in range(1,6):
         path = '//*[@id="quoteNewsStream-0-Stream"]/ul/li[' + str(i) + ']/div/div/div[1]/div/span[1]'
@@ -58,7 +79,7 @@ def find_news_providers():
         news_providers.append(provider)
     return news_providers
 
-def find_news_dates():
+def find_news_dates(driver):
     news_dates = []
     for i in range(1,6):
         path = '//*[@id="quoteNewsStream-0-Stream"]/ul/li[' + str(i) + ']/div/div/div[1]/div/span[2]'
@@ -80,7 +101,7 @@ def find_news_dates():
         news_dates.append(date)
     return news_dates
 
-def find_news_headlines():
+def find_news_headlines(driver):
     news_headlines = []
     news_links = []
     for i in range(1,6):
@@ -113,23 +134,4 @@ print(headline2[0].text)
 print('--------------------')
 
 '''
-
-
-# prices = find_price_and_changes()
-# print(prices) 
-# -- done -- no loop required -- verified working as of 17/7/2020
-
-# news_providers = find_news_providers() 
-# print(news_providers) 
-# -- loop done -- verified working as of 17/7/2020
-# small issue refer to sticky notes -- resolved
-
-# news_dates = find_news_dates()
-# print(news_dates) 
-# -- loop done -- verified working as of 17/7/2020
-
-# news_headlines = find_news_headlines()
-# print(news_headlines) 
-# -- loop done -- verified working as of 17/7/2020
-
 
