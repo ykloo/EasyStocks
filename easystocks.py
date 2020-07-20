@@ -29,10 +29,12 @@ def help_command(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Please enter a stock ticker to start!')
 
-def enter(update, context, text):
-    """Send a message when the command /help is issued."""
+def loading(update, context, text):
     update.message.reply_text(f'This is what you have entered: {text}')
     update.message.reply_text('Searching...')
+    enter(update, context, text)
+
+def enter(update, context, text):
     try:
         data = initialise_driver(text)
         print("Stock found!")
@@ -65,7 +67,7 @@ def get_output(data):
 def echo(update, context):
     """Echo the user message."""
     text = update.message.text
-    return enter(update, context, text)
+    return loading(update, context, text)
 
 def store(update, context):
     update.message.reply_text('Please enter the stock tickers that you want to highlight, leaving a space in between each ticker')
