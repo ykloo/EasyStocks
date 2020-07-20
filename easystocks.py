@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update):
+def start(update, context):
     """Send a message when the command /start is issued.
        This two commands have the same function, but context.bot.send_message is more time consuming and annoying, 
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
@@ -25,11 +25,11 @@ def start(update):
     update.message.reply_text(text, parse_mode = 'HTML')
 
 
-def help_command(update):
+def help_command(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Please enter a stock ticker to start!')
 
-def enter(update, text):
+def enter(update, context, text):
     """Send a message when the command /help is issued."""
     update.message.reply_text(f'This is what you have entered: {text}')
     update.message.reply_text('Searching...')
@@ -62,12 +62,12 @@ def get_output(data):
         output += f'{author} | {date} \n{i+1}.  <a href="{link}">{headline}</a> \n\n'
     return output
 
-def echo(update):
+def echo(update, context):
     """Echo the user message."""
     text = update.message.text
-    return enter(update, text)
+    return enter(update, context, text)
 
-def store(update):
+def store(update, context):
     update.message.reply_text('Please enter the stock tickers that you want to highlight, leaving a space in between each ticker')
     highlighted = update.message.text
     #creates a list of stock(s) selected by the user
