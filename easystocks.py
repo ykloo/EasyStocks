@@ -22,7 +22,7 @@ def start(update, context):
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
 
     text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start!</b>\n\neg. AAPL, TSLA \n\nFor stocks listed in SGX, please add .SI suffix at the end of your input. \n\n<b>Looking for a stock that not based in SG or US, click <a href="https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html">here</a> for relevant suffixes</b>'
-    update.message.reply_text(text, parse_mode = 'HTML')
+    update.message.reply_text(text, parse_mode = 'HTML', disable_web_page_preview = True)
 
 
 def help_command(update, context):
