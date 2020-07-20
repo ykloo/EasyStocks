@@ -65,7 +65,6 @@ def get_output(data):
     return output
 
 def echo(update, context):
-    """Echo the user message."""
     text = update.message.text
     return loading(update, context, text)
 
