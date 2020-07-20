@@ -55,7 +55,7 @@ def enter(update, context, text):
     
     update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
     
-
+#hello-world
 def get_output(data):
     name = data[0]
     price_changes = data[1]
