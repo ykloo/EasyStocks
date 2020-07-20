@@ -2,17 +2,6 @@
 # -*- coding: utf-8 -*-
 # This program is dedicated to the public domain under the CC0 license.
 
-"""
-Simple Bot to reply to Telegram messages.
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -27,21 +16,20 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(update):
     """Send a message when the command /start is issued.
        This two commands have the same function, but context.bot.send_message is more time consuming and annoying, 
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
 
-    # context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
     text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start!</b>\n\neg. AAPL, TSLA \n\nFor stocks listed in SGX, please add .SI suffix at the end of your input. \n\n<b>Looking for a stock that not based in SG or US, click <a href="https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html">here</a> for relevant suffixes</b>'
     update.message.reply_text(text, parse_mode = 'HTML')
 
 
-def help_command(update, context):
+def help_command(update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Please enter a stock ticker to start!')
 
-def enter(update, context, text):
+def enter(update, text):
     """Send a message when the command /help is issued."""
     update.message.reply_text(f'This is what you have entered: {text}')
     update.message.reply_text('Searching...')
@@ -55,7 +43,6 @@ def enter(update, context, text):
     
     update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
     
-#hello-world
 def get_output(data):
     name = data[0]
     price_changes = data[1]
@@ -75,10 +62,25 @@ def get_output(data):
         output += f'{author} | {date} \n{i+1}.  <a href="{link}">{headline}</a> \n\n'
     return output
 
-def echo(update, context):
+def echo(update):
     """Echo the user message."""
     text = update.message.text
-    return enter(update, context, text)
+    return enter(update, text)
+
+def store(update):
+    update.message.reply_text('Please enter the stock tickers that you want to highlight, leaving a space in between each ticker')
+    highlighted = update.message.text
+    #creates a list of stock(s) selected by the user
+    global highlighted_stocks
+    highlighted_stocks = highlighted.split(' ')
+    return highlighted_stocks
+
+# def display_selected(update):
+#     for ticker in highlighted_stocks:
+
+    
+
+
 
 
 def main():
@@ -94,6 +96,9 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
+    dp.add_handler(CommandHandler("store", store))
+    # dp.add_handler(CommandHandler("selected", display_selected))
+
 
 
     # on noncommand i.e message - echo the message on Telegram
