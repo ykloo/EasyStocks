@@ -20,10 +20,13 @@ def initialise_driver(text):
     #returns tuple consisting of price and its changes
     price_changes = find_price_and_changes(driver)
 
+    #returns list of authors
     authors = find_news_providers(driver)
 
+    #returns list of dates
     dates = find_news_dates(driver)
 
+    #returns list of headlines
     headlines_links = find_news_headlines(driver)
     driver.quit()
 

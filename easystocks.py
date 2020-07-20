@@ -45,8 +45,19 @@ def enter(update, context, text):
     """Send a message when the command /help is issued."""
     update.message.reply_text(f'This is what you have entered: {text}')
     update.message.reply_text('Searching...')
-    data = initialise_driver(text)
+    try:
+        data = initialise_driver(text)
+        print("Stock found!")
+        output = get_output(data)
+    except:
+        print("Stock not found!")
+        output = 'Stock not found! Please enter the correct ticker!'
+    
+    update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
+    
 
+    # return text
+def get_output(data):
     name = data[0]
     price_changes = data[1]
     articles_objects = data[2]
@@ -62,16 +73,8 @@ def enter(update, context, text):
         date = article.date
         headline = article.headline
         link = article.link
-        # output += f'{author} {date} \n{i+1}.{headline} \n{link} \n\n '
         output += f'{author} | {date} \n{i+1}.  <a href="{link}">{headline}</a> \n\n'
-
-
-
-    update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
-    
-
-    # return text
-
+    return output
 
 def echo(update, context):
     """Echo the user message."""
