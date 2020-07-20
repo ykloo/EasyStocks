@@ -33,7 +33,7 @@ def start(update, context):
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
 
     # context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
-    text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start! \n\neg. AAPL, TSLA</b>'
+    text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start!</b>\n\neg. AAPL, TSLA \n\nFor stocks listed in SGX, please add .SI suffix at the end of your input. \n\n<b>Looking for a stock that not based in SG or US, click <a href="https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html">here</a> for relevant suffixes</b>'
     update.message.reply_text(text, parse_mode = 'HTML')
 
 
@@ -56,7 +56,6 @@ def enter(update, context, text):
     update.message.reply_text(output, parse_mode = 'HTML', disable_web_page_preview = True)
     
 
-    # return text
 def get_output(data):
     name = data[0]
     price_changes = data[1]
