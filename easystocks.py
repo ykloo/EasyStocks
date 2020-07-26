@@ -4,7 +4,7 @@
 
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
 from getNews import initialise_driver
 
 # Enable logging
@@ -68,8 +68,15 @@ def echo(update, context):
     text = update.message.text
     return loading(update, context, text)
 
+def cancel(update, context):
+    user = update.message.from_user
+    update.message.reply_text('Action cancelled. Please enter a stock ticker to continue.')
+
+    return ConversationHandler.END
 def store(update, context):
-    update.message.reply_text('Please enter the stock tickers that you want to highlight, leaving a space in between each ticker')
+    update.message.reply_text(
+        'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
+    #stocks that the user has selected
     highlighted = update.message.text
     #creates a list of stock(s) selected by the user
     global highlighted_stocks
@@ -97,12 +104,30 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
-    dp.add_handler(CommandHandler("store", store))
     # dp.add_handler(CommandHandler("selected", display_selected))
 
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('store', store)],
 
+        states={
+            # GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
 
-    # on noncommand i.e message - echo the message on Telegram
+            # PHOTO: [MessageHandler(Filters.photo, photo),
+            #         CommandHandler('skip', skip_photo)],
+
+            # LOCATION: [MessageHandler(Filters.location, location),
+            #            CommandHandler('skip', skip_location)],
+
+            # BIO: [MessageHandler(Filters.text & ~Filters.command, bio)]
+        },
+
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+
+    dp.add_handler(conv_handler)
+
+    # on noncommand i.e message - by default launches a search for the inputted ticker
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     # Start the Bot
