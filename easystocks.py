@@ -75,15 +75,18 @@ def cancel(update, context):
 
 def shortlisted(update, context):
     update.message.reply_text(
-        'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
-    #stocks that the user has selected
-    highlighted = update.message.text
-    #creates a list of stock(s) selected by the user
-    global highlighted_stocks
-    highlighted_stocks = highlighted.split(' ')
-    return highlighted_stocks
+    'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
+    #stock(s) that the user has selected in string format
+    global shortlist
+    shortlist = update.message.text
+    #storing the selected stocks into db
+    store_to_db(shortlist)
+    
 
-def store_to_db(highlighted_stocks):
+def store_to_db(shortlist):
+    
+
+
     
     
 
