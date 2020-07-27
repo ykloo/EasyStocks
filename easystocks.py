@@ -69,11 +69,11 @@ def echo(update, context):
     return loading(update, context, text)
 
 def cancel(update, context):
-    user = update.message.from_user
     update.message.reply_text('Action cancelled. Please enter a stock ticker to continue.')
 
     return ConversationHandler.END
-def store(update, context):
+
+def shortlisted(update, context):
     update.message.reply_text(
         'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
     #stocks that the user has selected
@@ -83,9 +83,8 @@ def store(update, context):
     highlighted_stocks = highlighted.split(' ')
     return highlighted_stocks
 
-# def display_selected(update):
-#     for ticker in highlighted_stocks:
-
+def store_to_db(highlighted_stocks):
+    
     
 
 
@@ -108,7 +107,7 @@ def main():
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('store', store)],
+        entry_points=[CommandHandler('store', shortlisted)],
 
         states={
             # GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
