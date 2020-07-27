@@ -6,6 +6,7 @@ import logging
 
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
 from getNews import initialise_driver
+from db import check_user, update, create_update
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -77,14 +78,20 @@ def shortlisted(update, context):
     update.message.reply_text(
     'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
     #stock(s) that the user has selected in string format
-    global shortlist
+    # global shortlist
     shortlist = update.message.text
+    id = update.message.chat_id
     #storing the selected stocks into db
-    store_to_db(shortlist)
+    store_to_db(shortlist, id)
     
 
-def store_to_db(shortlist):
-    
+def store_to_db(shortlist, id):
+    if check_user(id):
+        update(id, shortlist)
+    else:
+        create_update(id, shortlist)
+
+
 
 
     
