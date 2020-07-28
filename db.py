@@ -5,7 +5,7 @@ config = {
   "authDomain": "telegram-bot-bbc09.firebaseapp.com",
   "databaseURL": "https://telegram-bot-bbc09.firebaseio.com",
   "storageBucket": "telegram-bot-bbc09.appspot.com",
-  "serviceAccount": "./credentials.json"
+  "serviceAccount": r'C:\Bot\telegram-bot-bbc09-firebase-adminsdk-u38dz-15b70d4665.json'
 }
 
 
@@ -19,7 +19,7 @@ def check_user(id):
         return False
     return True
 
-def update(id, shortlist):
+def overwrite(id, shortlist):
     db.child(id).update({"stocks": shortlist})
 
 def create_update(id, shortlist):

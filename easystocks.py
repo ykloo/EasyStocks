@@ -6,13 +6,17 @@ import logging
 
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
 from getNews import initialise_driver
-from db import check_user, update, create_update
+from db import check_user, overwrite, create_update
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+REVIEW, CHANGE = range(2)
+
+temp = {}
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -69,33 +73,47 @@ def echo(update, context):
     text = update.message.text
     return loading(update, context, text)
 
+
+def shortlisted(update, context):
+    update.message.reply_text(
+    'Please enter the stock ticker(s) that you want to shortlist, leaving a space between each ticker')
+    global id
+    id = update.message.chat_id
+    return REVIEW
+
+def review(update, context):
+    global shortlist
+    shortlist = update.message.text
+    print(shortlist)
+    update.message.reply_text(
+        f'This is what you have entered: {shortlist}\n' 
+        'Do you want to make any changes? Re-enter the ticker(s) if you wish to or send /skip if you don\'t want to.')
+    return CHANGE
+
+def skip_review_add(update, context):
+    # change = False
+    return store_to_db(shortlist, id, update, context, change)
+
+def change(update, context):
+    # change = True
+    shortlist = update.message.text
+    # update.message.reply_text('Re-enter the ticker(s) that you want to shortlist, leaving a space between each ticker')
+    return store_to_db(shortlist, id, update, context, change)
+
+
+
+def store_to_db(shortlist, id, update, context, change):
+    if check_user(id):
+        overwrite(id, shortlist)
+    else:
+        create_update(id, shortlist)
+    update.message.reply_text("Shortlist updated!")
+    return ConversationHandler.END
+
 def cancel(update, context):
     update.message.reply_text('Action cancelled. Please enter a stock ticker to continue.')
 
     return ConversationHandler.END
-
-def shortlisted(update, context):
-    update.message.reply_text(
-    'Please enter the stock ticker(s) that you want to shortlist, leaving a space in between each ticker')
-    #stock(s) that the user has selected in string format
-    # global shortlist
-    shortlist = update.message.text
-    id = update.message.chat_id
-    #storing the selected stocks into db
-    store_to_db(shortlist, id)
-    
-
-def store_to_db(shortlist, id):
-    if check_user(id):
-        update(id, shortlist)
-    else:
-        create_update(id, shortlist)
-
-
-
-
-    
-    
 
 
 
@@ -120,15 +138,11 @@ def main():
         entry_points=[CommandHandler('store', shortlisted)],
 
         states={
-            # GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
+            REVIEW: [MessageHandler(Filters.text, review)],
 
-            # PHOTO: [MessageHandler(Filters.photo, photo),
-            #         CommandHandler('skip', skip_photo)],
+            CHANGE: [MessageHandler(Filters.text & ~Filters.command, change),
+                CommandHandler('skip', skip_review_add )],
 
-            # LOCATION: [MessageHandler(Filters.location, location),
-            #            CommandHandler('skip', skip_location)],
-
-            # BIO: [MessageHandler(Filters.text & ~Filters.command, bio)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
