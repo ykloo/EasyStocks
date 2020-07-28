@@ -6,7 +6,7 @@ import logging
 
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
 from getNews import initialise_driver
-from db import check_user, overwrite, create_update
+from db import check_user, overwrite, create_update, retrieve_stocks
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,21 +18,31 @@ REVIEW, CHANGE = range(2)
 
 temp = {}
 
-
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+#starts the bot
 def start(update, context):
     """Send a message when the command /start is issued.
        This two commands have the same function, but context.bot.send_message is more time consuming and annoying, 
        update.message is simply a shortcut, it handles the setting of chat_id and reply_to_message_id for you"""
-
-    text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start!</b>\n\neg. AAPL, TSLA \n\nFor stocks listed in SGX, please add .SI suffix at the end of your input. \n\n<b>Looking for a stock that not based in SG or US, click <a href="https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html">here</a> for relevant suffixes</b>'
+    global id
+    id = update.message.chat_id
+    text = '<b>Hello! Welcome to EasyStocks! Enter a stock ticker to start!</b>\n\neg. AAPL, TSLA \n\nFor stocks listed in SGX, please add .SI suffix at the end of your input. \n\n<b>Looking for a stock not based in Singapore or United States? click <a href="https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html">here</a> for relevant suffixes</b>\n\nShortlisted some stock(s) previously? Enter /selected to view them now.'
     update.message.reply_text(text, parse_mode = 'HTML', disable_web_page_preview = True)
 
-
+#displays help
 def help_command(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Please enter a stock ticker to start!')
+    update.message.reply_text(
+        'Welcome to EasyStocks!\n'
+        'Commands available:\n'
+        '/start - starts the bot\n'
+        '/shortlist - shortlists stocks for one-click viewing\n'
+        '/selected - shows shortlisted stocks\n'
+        'Have a great day!')
+
+#upon input of a stock ticker
+def echo(update, context):
+    text = update.message.text
+    return loading(update, context, text)
 
 def loading(update, context, text):
     update.message.reply_text(f'This is what you have entered: {text}')
@@ -69,16 +79,12 @@ def get_output(data):
         output += f'{author} | {date} \n{i+1}.  <a href="{link}">{headline}</a> \n\n'
     return output
 
-def echo(update, context):
-    text = update.message.text
-    return loading(update, context, text)
 
-
+#ConversationHandlers functions
 def shortlisted(update, context):
     update.message.reply_text(
     'Please enter the stock ticker(s) that you want to shortlist, leaving a space between each ticker')
-    global id
-    id = update.message.chat_id
+
     return REVIEW
 
 def review(update, context):
@@ -101,7 +107,6 @@ def change(update, context):
     return store_to_db(shortlist, id, update, context, change)
 
 
-
 def store_to_db(shortlist, id, update, context, change):
     if check_user(id):
         overwrite(id, shortlist)
@@ -115,27 +120,36 @@ def cancel(update, context):
 
     return ConversationHandler.END
 
+#displays stocks previously shortlisted
+def display_selected(update, context):
+    #checks if the user has shortlisted stock(s) previously
+    update.message.reply_text("Searching...")
+    if check_user(id):
+        stocks = retrieve_stocks(id)
+        update.message.reply_text(f'This is what you have shortlisted: {stocks}')
+        stocks = stocks.split(' ')
+        for ticker in stocks:
+            enter(update, context, ticker)
+    else:
+        update.message.reply_text("User has not shortlisted any")
 
 
 
 def main():
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
     updater = Updater("1375620415:AAHFeCrxPDEg0LciMuhQM1D7EIfJ9bDJqkg", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
+    # on different commands 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
-    # dp.add_handler(CommandHandler("selected", display_selected))
+    dp.add_handler(CommandHandler("selected", display_selected))
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    # Add conversation handler with the states REVIEW, CHANGE
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('store', shortlisted)],
+        entry_points=[CommandHandler('shortlist', shortlisted)],
 
         states={
             REVIEW: [MessageHandler(Filters.text, review)],

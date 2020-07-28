@@ -122,19 +122,3 @@ def find_news_headlines(driver):
         news_headlines.append(headline)
         news_links.append(link)
     return news_headlines, news_links
-
-'''
-use this to check for advertisement issues
-
-headline1 = driver.find_elements_by_xpath('//*[@id="quoteNewsStream-0-Stream"]/ul/li[4]/div/div/div[1]/h3/a')
-print(len(headline1))
-print(headline1[0].text)
-print('--------------------')
-
-headline2 = driver.find_elements_by_xpath('//*[@id="quoteNewsStream-0-Stream"]/ul/li[4]/div/div/div[2]/h3/a')
-print(len(headline2))
-print(headline2[0].text)
-print('--------------------')
-
-'''
-

@@ -26,16 +26,10 @@ def create_update(id, shortlist):
     data = {"stocks": shortlist}
     db.child(id).set(data)
 
+def retrieve_stocks(id):
+    stocks = db.child(id).child('stocks').get()
+    return stocks.val()
 
-
-# more = {"stocks": "FB GOOGL TSLA"}
-# db.child("users").child(551145).set(more)
-# db.child("users").child("YK").update({"id": 1234})
-
-
-# user = db.child("users").child(12345).child('stocks').get()
+# user = db.child("users").child(345).get()
 # print(user.val())
-
-user = db.child("users").child(345).get()
-print(user.val())
 
