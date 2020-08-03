@@ -17,11 +17,11 @@ A simple telegram bot for stocks written in Python
 
 # Usage
 Upon starting the bot with /start
-![Image of Start](https://imgur.com/xdCIcZg)
+[Image of Start](https://imgur.com/xdCIcZg)
 
 
 Upon input of a ticker
-![Image of Start](https://imgur.com/a/uheqLKR)
+[AAPL](https://imgur.com/a/uheqLKR)
 
 
 # Libraries used
