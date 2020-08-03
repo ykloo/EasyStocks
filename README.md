@@ -22,4 +22,5 @@ A simple telegram bot for stocks written in Python
 3. Python-Telegram-Bot as a wrapper for Telegram Bot's API
 
 Hosted on Heroku
+
 Link to Bot: http://t.me/easyStocksBot
