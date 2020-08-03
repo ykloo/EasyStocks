@@ -9,8 +9,7 @@ from News import News
 def initialise_driver(text):
     options = webdriver.ChromeOptions()
     options.add_argument("headless")
-    driver = webdriver.Chrome('C:\Bot\chromedriver.exe',options=options)
-    # driver = webdriver.Chrome()
+    driver = webdriver.Chrome('<CHROMEDRIVER LOCATION>',options=options)
     driver.get(f'https://sg.finance.yahoo.com/quote/{text}')
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="quoteNewsStream-0-Stream"]/ul')))
 
@@ -45,6 +44,7 @@ def initialise_driver(text):
         list_news.append(article)
     return name, price_changes, list_news
 
+#finds the name of the stock
 def find_name(driver):
     name = driver.find_elements_by_xpath('//*[@id="quote-header-info"]/div[2]/div[1]/div[1]/h1')
     return name[0].text

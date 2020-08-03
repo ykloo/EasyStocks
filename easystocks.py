@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
-
 import logging
 
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
@@ -80,7 +76,11 @@ def get_output(data):
     return output
 
 
-#ConversationHandlers functions
+'''
+The following 6 functions: 
+SHORTLISTED, REVIEW, SKIP_REVIEW_ADD, CHANGE, STORE_TO_DB, CANCEL
+work as part of the ConversationHandler
+'''
 def shortlisted(update, context):
     update.message.reply_text(
     'Please enter the stock ticker(s) that you want to shortlist, leaving a space between each ticker')
@@ -90,20 +90,16 @@ def shortlisted(update, context):
 def review(update, context):
     global shortlist
     shortlist = update.message.text
-    print(shortlist)
     update.message.reply_text(
         f'This is what you have entered: {shortlist}\n' 
         'Do you want to make any changes? Re-enter the ticker(s) if you wish to or send /skip if you don\'t want to.')
     return CHANGE
 
 def skip_review_add(update, context):
-    # change = False
     return store_to_db(shortlist, id, update, context, change)
 
 def change(update, context):
-    # change = True
     shortlist = update.message.text
-    # update.message.reply_text('Re-enter the ticker(s) that you want to shortlist, leaving a space between each ticker')
     return store_to_db(shortlist, id, update, context, change)
 
 
@@ -137,7 +133,7 @@ def display_selected(update, context):
 
 def main():
     """Start the bot."""
-    updater = Updater("1375620415:AAHFeCrxPDEg0LciMuhQM1D7EIfJ9bDJqkg", use_context=True)
+    updater = Updater("<BOT TOKEN>", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
