@@ -4,7 +4,7 @@ A simple telegram bot for stocks written in Python
 
 # Main Features
 1. Retrieval of stock data (Price, Price Changes, 5 most recent news) upon input of stock ticker
-2. User can favourite stock ticke(s) that they frequently monitor to a shortlist that can be displayed with one-click
+2. User can favourite stock ticker(s) that they frequently monitor to a shortlist that can be displayed with one-click
 
 
 # Commands
@@ -14,6 +14,14 @@ A simple telegram bot for stocks written in Python
 /shortlist - shortlists ticker(s) for one-click display
 /selected - displays shortlisted stocks
 ```
+
+# Usage
+Upon starting the bot with /start
+![Image of Start](https://imgur.com/xdCIcZg)
+
+
+Upon input of a ticker
+![Image of Start](https://imgur.com/a/uheqLKR)
 
 
 # Libraries used
