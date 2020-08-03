@@ -23,7 +23,7 @@ Upon starting the bot with /start
 
 
 
-Upon input of a ticker
+Upon input of a ticker (e.g. AAPL)
 
 <img src="https://imgur.com/Ng0yssP.png" width="520">
 
